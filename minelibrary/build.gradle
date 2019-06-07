@@ -1,8 +1,9 @@
-if(isDebugModule.toBoolean()){
-    apply plugin: 'com.android.application'
-}else{
-    apply plugin: 'com.android.library'
-}
+//if(isDebugModule.toBoolean()){
+//    apply plugin: 'com.android.application'
+//}else{
+//    apply plugin: 'com.android.library'
+//}
+apply from: rootProject.file('cc-settings-2.gradle')
 
 android {
     compileSdkVersion 28
@@ -15,6 +16,10 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        //仅在以application方式编译时才添加applicationId属性
+        if (project.ext.runAsApp) {
+            applicationId 'com.billy.cc.demo.component.a'
+        }
 
     }
 

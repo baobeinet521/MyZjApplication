@@ -1,4 +1,7 @@
 apply plugin: 'com.android.application'
+
+ext.mainApp = true //标记为主app module
+apply from: rootProject.file('cc-settings-2.gradle')
 android {
     compileSdkVersion 28
     defaultConfig {
@@ -24,5 +27,6 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
-    implementation project(':minelibrary')
+//    implementation project(':minelibrary')
+    addComponent 'minelibrary' //会默认添加依赖：project(':demo_component_a')
 }

@@ -1,2 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.minelibrary" />
+    package="com.minelibrary" >
+    <application>
+        <activity android:name=".ActivityA"></activity>
+    </application>
+
+</manifest>
+
