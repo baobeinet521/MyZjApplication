@@ -1,9 +1,10 @@
-package com.myzjapplication;
+package com.myzjapplication.component;
 
 import com.billy.cc.core.component.CC;
 import com.billy.cc.core.component.CCResult;
 import com.billy.cc.core.component.CCUtil;
 import com.billy.cc.core.component.IComponent;
+import com.myzjapplication.activity.SecondActivity;
 
 public class ComponentMain implements IComponent {
     @Override

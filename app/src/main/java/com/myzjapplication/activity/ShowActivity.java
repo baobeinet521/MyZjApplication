@@ -1,4 +1,4 @@
-package com.myzjapplication;
+package com.myzjapplication.activity;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -10,6 +10,7 @@ import android.widget.Toast;
 import com.billy.cc.core.component.CC;
 import com.billy.cc.core.component.CCResult;
 import com.billy.cc.core.component.IComponentCallback;
+import com.myzjapplication.R;
 
 public class ShowActivity extends AppCompatActivity {
     private Button mJumpBtn;

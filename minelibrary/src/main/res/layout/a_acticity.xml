@@ -16,4 +16,10 @@
         android:layout_height="50dp"
         android:text="跳转到主项目的second"/>
 
+    <Button
+        android:id="@+id/goto_mine"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:text="跳转到我的"/>
+
 </LinearLayout>

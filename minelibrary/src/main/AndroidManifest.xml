@@ -2,6 +2,7 @@
     package="com.minelibrary" >
     <application>
         <activity android:name=".ActivityA"></activity>
+        <activity android:name=".MineActivity"></activity>
     </application>
 
 </manifest>
