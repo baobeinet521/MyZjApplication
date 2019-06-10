@@ -11,4 +11,9 @@ public class Utils implements BaseInterface {
     public String getNowString() {
         return "调用我写的getString方法";
     }
+
+
+    public static String getStringFromCC(){
+        return "通过CC的方式调用app的方法";
+    }
 }
