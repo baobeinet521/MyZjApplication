@@ -9,8 +9,10 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.Build;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -21,6 +23,9 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.myzjapplication.R;
+import com.myzjapplication.util.SystemUtil;
+
+import java.io.File;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -28,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
     public static String TAG ="audioInfo";
     private Button mBtn;
     private Button mGetAudioBtn;
+    private Button mGotoStorePath;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         mBtn = findViewById(R.id.goto_show);
         mGetAudioBtn = findViewById(R.id.get_audio_info_btn);
+        mGotoStorePath = findViewById(R.id.goto_store_path);
         mBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -52,6 +59,31 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+        mGotoStorePath.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                intent.setType("*/*");
+                intent.addCategory(Intent.CATEGORY_OPENABLE);
+                startActivityForResult(intent, 1);
+            }
+        });
+        getPath();
+    }
+
+    public void getPath(){
+        File path = Environment.getExternalStorageDirectory();
+        File child;
+        String brand  = SystemUtil.getDeviceBrand();
+        Log.w(TAG, "------------brand = " + brand);
+        switch (brand){
+            case "Xiaomi":
+                break;
+            case "OnePlus":
+                break;
+            case "Meizu":
+                break;
+        }
     }
 
 
@@ -69,7 +101,8 @@ public class MainActivity extends AppCompatActivity {
             String title =  cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE));
             String displayName = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DISPLAY_NAME));
             String size =  cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.SIZE));
-            Log.w(TAG, "title     " + title +"displayName     " +displayName + "size     " +size);
+            String data =  cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
+            Log.w(TAG, "title     " + title +"      displayName     " +displayName + "   size     " +size +"    data   "+data);
             cursor.moveToNext();
         }
         cursor.close();
@@ -89,7 +122,8 @@ public class MainActivity extends AppCompatActivity {
             String title =  cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE));
             String displayName = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DISPLAY_NAME));
             String size =  cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.SIZE));
-            Log.w(TAG, "title     " + title +"displayName     " +displayName + "size     " +size);
+            String data =  cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
+            Log.w(TAG, "title     " + title +"        displayName     " +displayName + "     size     " +size + "   data    " + data);
             cursor.moveToNext();
         }
         cursor.close();
@@ -153,5 +187,10 @@ public class MainActivity extends AppCompatActivity {
                 super.onRequestPermissionsResult(requestCode, permissions,
                         grantResults);
         }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
     }
 }
