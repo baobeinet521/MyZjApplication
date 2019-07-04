@@ -10,6 +10,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
@@ -34,6 +35,7 @@ import com.myzjapplication.util.SystemUtil;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Vector;
@@ -176,6 +178,27 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         return vecFile;
+    }
+
+    /**
+     * 获取文件时长
+     * @return
+     */
+    public String getAudioTime(String path){
+        File file = new File(path);
+
+        MediaPlayer meidaPlayer = new MediaPlayer();
+
+        try {
+            meidaPlayer.setDataSource(file.getPath());
+            meidaPlayer.prepare();
+            long time = meidaPlayer.getDuration();//获得了视频的时长（以毫秒为单位）
+            long timeSecond = time / 1000;
+            Log.d(TAG, " getAudioTime   音频时长   " + timeSecond);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return "";
     }
 
     public Vector<String> getFileNameNoFilter(String fileAbsolutePath) {
@@ -382,6 +405,7 @@ public class MainActivity extends AppCompatActivity {
                     Log.d(TAG, "onActivityResult: 4.4以前 path " + path);
                     Toast.makeText(MainActivity.this, path + "222222", Toast.LENGTH_SHORT).show();
                 }
+                getAudioTime(path);
             }
 
 
