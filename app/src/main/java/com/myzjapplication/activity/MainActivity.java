@@ -26,9 +26,13 @@ import com.myzjapplication.R;
 import com.myzjapplication.util.SystemUtil;
 
 import java.io.File;
+import java.util.Vector;
 
 public class MainActivity extends AppCompatActivity {
 
+    public static String BRAND_XIAOMI = "Xiaomi";
+    public static String BRAND_ONEPLUS = "OnePlus";
+    public static String BRAND_MEIZU = "Meizu";
     public static final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 123;
     public static String TAG ="audioInfo";
     private Button mBtn;
@@ -52,10 +56,12 @@ public class MainActivity extends AppCompatActivity {
         mGetAudioBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (checkPermissionStore(MainActivity.this)) {
-                    getExternalAudioInfo();
-                    geInternalAudioInfo();
-                }
+//                if (checkPermissionStore(MainActivity.this)) {
+//                    getExternalAudioInfo();
+//                    geInternalAudioInfo();
+//                }
+                String path = getPath();
+                getFileName(path);
 
             }
         });
@@ -68,22 +74,60 @@ public class MainActivity extends AppCompatActivity {
                 startActivityForResult(intent, 1);
             }
         });
-        getPath();
+        String path = getPath();
+        Log.d(TAG, "onCreate: path   " + path);
+
     }
 
-    public void getPath(){
-        File path = Environment.getExternalStorageDirectory();
-        File child;
+    public String getPath(){
+        File parent = Environment.getExternalStorageDirectory();
+        File child = null;
         String brand  = SystemUtil.getDeviceBrand();
         Log.w(TAG, "------------brand = " + brand);
         switch (brand){
             case "Xiaomi":
+                child = new File(parent,"MIUI/sound_recorder");
                 break;
             case "OnePlus":
                 break;
             case "Meizu":
                 break;
+            case "HONOR":
+                child = new File(parent,"Sounds");
+                parent.getPath();
+                Log.d(TAG, "华为sdcard getPath: "  + parent.getPath());
+                break;
         }
+        if(child != null){
+            return child.getPath();
+        }else{
+            return  "";
+        }
+
+    }
+
+
+    public static Vector<String> getFileName(String fileAbsolutePath) {
+        Vector<String> vecFile = new Vector<String>();
+        File file = new File(fileAbsolutePath);
+        if(!file.exists()){
+            return null;
+        }
+        File[] subFile = file.listFiles();
+        if(subFile == null){
+            return null;
+        }
+        for (int iFileLength = 0; iFileLength < subFile.length; iFileLength++) {
+            // 判断是否为文件夹
+            File _file = subFile[iFileLength];
+            if (!_file.isDirectory()) {
+                String filename = _file.getName();
+                Log.e(TAG,"eee  文件名 ： " + filename);
+            }else{
+                getFileName(_file.getAbsolutePath());
+            }
+        }
+        return vecFile;
     }
 
 
