@@ -32,6 +32,7 @@ import com.myzjapplication.FileDataBean;
 import com.myzjapplication.R;
 import com.myzjapplication.util.FilePathUtils;
 import com.myzjapplication.util.SystemUtil;
+import com.myzjapplication.util.TimeUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -194,7 +195,8 @@ public class MainActivity extends AppCompatActivity {
             meidaPlayer.prepare();
             long time = meidaPlayer.getDuration();//获得了视频的时长（以毫秒为单位）
             long timeSecond = time / 1000;
-            Log.d(TAG, " getAudioTime   音频时长   " + timeSecond);
+            String tineFormat =TimeUtils.secondsToString(timeSecond);
+            Log.d(TAG, " getAudioTime   音频时长   " + timeSecond + "  转换后的时间 " +tineFormat);
         } catch (IOException e) {
             e.printStackTrace();
         }
