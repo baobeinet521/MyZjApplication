@@ -1,20 +1,15 @@
 package com.myzjapplication.activity;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.ContentUris;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
-import android.os.Environment;
-import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -22,7 +17,6 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -30,15 +24,8 @@ import android.widget.Toast;
 
 import com.myzjapplication.FileDataBean;
 import com.myzjapplication.R;
-import com.myzjapplication.util.FilePathUtils;
-import com.myzjapplication.util.SystemUtil;
-import com.myzjapplication.util.TimeUtils;
+import com.myzjapplication.util.FileUtils;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
 import java.util.Vector;
 
 public class MainActivity extends AppCompatActivity {
@@ -72,18 +59,18 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (checkPermissionStore(MainActivity.this)) {
-//                    getExternalAudioInfo();
-//                    geInternalAudioInfo();
-                    String path = getPath();
+                    getExternalAudioInfo();
+                    geInternalAudioInfo();
+                    String path = FileUtils.getRecordFilePath();
                     Log.d(TAG, " path111111   " + path);
                     vecFile.clear();
-                    getFileName(path);
-                    String wechatPath = getTecentPath();
-                    getFileName(wechatPath);
+                    FileUtils.getFileInfoHasFilter(path);
+                    String wechatPath = FileUtils.getTecentPath();
+                    FileUtils.getFileInfoHasFilter(wechatPath);
                     if (vecFile != null) {
                         Log.d(TAG, "onClick: vecFile Size   " + vecFile.size());
                     }
-//                    getFileNameNoFilter(wechatPath);
+//                    getFileInfoNoFilter(wechatPath);
                 }
 
 
@@ -99,188 +86,12 @@ public class MainActivity extends AppCompatActivity {
                 startActivityForResult(intent, 1);
             }
         });
-//        String path = getPath();
+//        String path = getFilePath();
 //        Log.d(TAG, "onCreate: path   " + path);
 
     }
 
-    public String getPath() {
-        File parent = Environment.getExternalStorageDirectory();
-        File child = null;
-        String brand = SystemUtil.getDeviceBrand();
-        Log.w(TAG, "------------brand = " + brand);
-        switch (brand) {
-            case "Xiaomi":
-                child = new File(parent, "MIUI/sound_recorder");
-                break;
-            case "OnePlus":
-                child = new File(parent, "Record/SoundRecord");
-                break;
-            case "Meizu":
-                child = new File(parent, "Recorder");
-                break;
-            case "htc":
-                child = new File(parent, "My Documents/My recordings");
-                break;
-            case "HONOR":
-                child = new File(parent, "Sounds");
-                parent.getPath();
-                Log.d(TAG, "华为sdcard getPath: " + parent.getPath());
-                break;
-            case "vivo":
-                child = new File(parent, "Record");
-                break;
-        }
-        if (child != null) {
-            return child.getPath();
-        } else {
-            return "";
-        }
 
-    }
-
-    public String getTecentPath() {
-        File parent = Environment.getExternalStorageDirectory();
-        File child = null;
-        child = new File(parent, "tencent/MicroMsg/Download");
-        String weChatPath = child.getPath();
-        return weChatPath;
-    }
-
-
-    public Vector<FileDataBean> getFileName(String fileAbsolutePath) {
-        Log.d(TAG, " getFileName   path   " + fileAbsolutePath);
-        File file = new File(fileAbsolutePath);
-        if (!file.exists()) {
-            return null;
-        }
-        File[] subFile = file.listFiles();
-        if (subFile == null) {
-            Log.d(TAG, " getFileName   subFile  为空  ");
-            return null;
-        }
-        for (int iFileLength = 0; iFileLength < subFile.length; iFileLength++) {
-            // 判断是否为文件夹
-            File _file = subFile[iFileLength];
-            if (!_file.isDirectory() && _file.exists()) {
-                String filename = _file.getName();
-                if (!TextUtils.isEmpty(filename)) {
-                    if (filename.endsWith(".mp3") || filename.endsWith(".wav")
-                            || filename.endsWith(".m4a") || filename.endsWith(".amr")
-                            || filename.endsWith(".aac")) {
-                        FileDataBean data = getFileInfo(_file);
-                        vecFile.add(data);
-                    }
-                }
-
-
-            } else {
-                getFileName(_file.getAbsolutePath());
-            }
-        }
-        return vecFile;
-    }
-
-    /**
-     * 获取文件时长
-     * @return
-     */
-    public String getAudioTime(String path){
-        File file = new File(path);
-
-        MediaPlayer meidaPlayer = new MediaPlayer();
-
-        try {
-            meidaPlayer.setDataSource(file.getPath());
-            meidaPlayer.prepare();
-            long time = meidaPlayer.getDuration();//获得了视频的时长（以毫秒为单位）
-            long timeSecond = time / 1000;
-            String tineFormat =TimeUtils.secondsToString(timeSecond);
-            Log.d(TAG, " getAudioTime   音频时长   " + timeSecond + "  转换后的时间 " +tineFormat);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return "";
-    }
-
-    public Vector<String> getFileNameNoFilter(String fileAbsolutePath) {
-        Log.d(TAG, " getFileName   path   " + fileAbsolutePath);
-        Vector<String> vecFile = new Vector<String>();
-        File file = new File(fileAbsolutePath);
-        if (!file.exists()) {
-            return null;
-        }
-        File[] subFile = file.listFiles();
-        if (subFile == null) {
-            Log.d(TAG, " getFileName   subFile  为空  ");
-            return null;
-        }
-        for (int iFileLength = 0; iFileLength < subFile.length; iFileLength++) {
-            // 判断是否为文件夹
-            File _file = subFile[iFileLength];
-            if (!_file.isDirectory() && _file.exists()) {
-                String filename = _file.getName();
-                if (!TextUtils.isEmpty(filename)) {
-                    getFileInfo(_file);
-                }
-
-
-            } else {
-                getFileName(_file.getAbsolutePath());
-            }
-        }
-        return vecFile;
-    }
-
-    public FileDataBean getFileInfo(File file) {
-        FileDataBean dataBean = new FileDataBean();
-        String filename = file.getName();
-        dataBean.setFileName(filename);
-        String filePath = file.getPath();
-        dataBean.setFilePath(filePath);
-        //获取 file大小 返回的是byte
-        Double fileLen = Double.parseDouble(String.valueOf(file.length()));
-        String fileCompany = "";
-        double fileLenM = 0;
-        if (fileLen < 1000000) {
-            fileLenM = fileLen / 1000;
-            fileCompany = "KB";
-        } else {
-            fileLenM = fileLen / 1000 / 1000;
-            fileCompany = "MB";
-        }
-        DecimalFormat df = new DecimalFormat("#.00");
-        String fileSize = df.format(fileLenM);
-        dataBean.setFileSizeNoCompany(fileSize);
-        dataBean.setFileSizeHasCompany(fileSize + fileCompany);
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-        long lastMofified = file.lastModified();
-        String fileTime = dateFormat.format(lastMofified);
-        dataBean.setFileTime(fileTime);
-        Log.e(TAG, "eee  文件名 ： " + filename + "   文件大小   " + fileSize + fileCompany + "   文件修改时间   " + fileTime + "   文件路径   " + filePath);
-        return dataBean;
-    }
-
-    /**
-     * 获取指定文件大小
-     * 可以获取得到
-     *
-     * @param
-     * @return
-     * @throws Exception
-     */
-    private long getFileSize(File file) throws Exception {
-        long size = 0;
-        if (file.exists()) {
-            FileInputStream fis = null;
-            fis = new FileInputStream(file);
-            size = fis.available();
-        } else {
-            file.createNewFile();
-            Log.e("获取文件大小", "文件不存在!");
-        }
-        return size;
-    }
 
     public void getExternalAudioInfo() {
         //存储在sd卡上的音频文件
@@ -399,15 +210,15 @@ public class MainActivity extends AppCompatActivity {
                     return;
                 }
                 if (Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT) {//4.4以后
-                    path = FilePathUtils.getPath(MainActivity.this, uri);
+                    path = FileUtils.getFilePath(MainActivity.this, uri);
                     Log.d(TAG, "onActivityResult: 4.4以后 path " + path);
                     Toast.makeText(this, path, Toast.LENGTH_SHORT).show();
                 } else {//4.4以下下系统调用方法
-                    path = FilePathUtils.getRealPathFromURI(this,uri);
+                    path = FileUtils.getRealPathFromURI(this,uri);
                     Log.d(TAG, "onActivityResult: 4.4以前 path " + path);
                     Toast.makeText(MainActivity.this, path + "222222", Toast.LENGTH_SHORT).show();
                 }
-                getAudioTime(path);
+                FileUtils.getAudioTime(path);
             }
 
 
