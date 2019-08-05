@@ -10,6 +10,7 @@ import android.os.Build;
 import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
+import android.support.annotation.RequiresApi;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -18,6 +19,10 @@ import com.myzjapplication.FileDataBean;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.FileTime;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Vector;
@@ -220,7 +225,7 @@ public class FileUtils {
                     if (filename.endsWith(".mp3") || filename.endsWith(".wav")
                             || filename.endsWith(".m4a") || filename.endsWith(".amr")
                             || filename.endsWith(".aac")) {
-                        FileDataBean data = getFileInfo(_file);
+                        FileDataBean data = getFileInfo(fileAbsolutePath,_file);
                         vecFile.add(data);
                     }
                 }
@@ -255,6 +260,7 @@ public class FileUtils {
         return "";
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     public Vector<String> getFileInfoNoFilter(String fileAbsolutePath) {
         Log.d(TAG, " getFileInfoNoFilter   path   " + fileAbsolutePath);
         Vector<String> vecFile = new Vector<String>();
@@ -273,7 +279,7 @@ public class FileUtils {
             if (!_file.isDirectory() && _file.exists()) {
                 String filename = _file.getName();
                 if (!TextUtils.isEmpty(filename)) {
-                    getFileInfo(_file);
+                    getFileInfo(fileAbsolutePath,_file);
                 }
 
 
@@ -284,7 +290,8 @@ public class FileUtils {
         return vecFile;
     }
 
-    public static FileDataBean getFileInfo(File file) {
+
+    public static FileDataBean getFileInfo(String path, File file) {
         FileDataBean dataBean = new FileDataBean();
         String filename = file.getName();
         dataBean.setFileName(filename);
@@ -308,6 +315,12 @@ public class FileUtils {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
         long lastMofified = file.lastModified();
         String fileTime = dateFormat.format(lastMofified);
+
+//        try {
+//            FileTime t= Files.readAttributes(Paths.get(path), BasicFileAttributes.class).creationTime();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
         dataBean.setFileTime(fileTime);
         Log.e(TAG, "eee  文件名 ： " + filename + "   文件大小   " + fileSize + fileCompany + "   文件修改时间   " + fileTime + "   文件路径   " + filePath);
         return dataBean;
