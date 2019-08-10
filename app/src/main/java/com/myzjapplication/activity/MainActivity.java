@@ -17,6 +17,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -218,7 +219,10 @@ public class MainActivity extends AppCompatActivity {
                     Log.d(TAG, "onActivityResult: 4.4以前 path " + path);
                     Toast.makeText(MainActivity.this, path + "222222", Toast.LENGTH_SHORT).show();
                 }
-                FileUtils.getAudioTime(path);
+                if(TextUtils.isEmpty(path)){
+                    Toast.makeText(MainActivity.this, "没有获取的音频文件路径", Toast.LENGTH_LONG).show();
+                }
+//                FileUtils.getAudioTime(path);
             }
 
 

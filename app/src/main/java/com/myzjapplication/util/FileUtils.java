@@ -116,18 +116,74 @@ public class FileUtils {
     public static String getDataColumn(Context context, Uri uri, String selection,
                                 String[] selectionArgs) {
 
+        Log.e(TAG, "getDataColumn: "+ uri);
         Cursor cursor = null;
-        final String column = "_data";
-        final String[] projection = {column};
+        Cursor cursorTemp = null;
+        Cursor cursorTempTest = null;
 
         try {
+            Log.e(TAG, "走正常逻辑    ");
+            final String columnData = MediaStore.Audio.Media.DATA;
+            final String[] projection = {columnData};
             cursor = context.getContentResolver().query(uri, projection, selection, selectionArgs,
                     null);
             if (cursor != null && cursor.moveToFirst()) {
-                final int column_index = cursor.getColumnIndexOrThrow(column);
-                return cursor.getString(column_index);
+                final int column_index = cursor.getColumnIndexOrThrow(columnData);
+                String path = cursor.getString(column_index);
+                Log.e(TAG, "走正常逻辑    获取到的文件路径是   " + path);
+                return path;
             }
-        } finally {
+        }catch (Exception e){
+            Log.e(TAG, "获取音频文件路径  走到catch里  ------------" +e.toString());
+            String displayName = "";
+            String data = "";
+            final String columnDiaPlayName = MediaStore.Audio.Media.DISPLAY_NAME;
+            final String[] projection = {columnDiaPlayName};
+
+            cursorTemp = context.getContentResolver().query(uri, projection, selection, selectionArgs,
+                    null);
+            if (cursorTemp != null && cursorTemp.moveToFirst()) {
+                final int column_index = cursorTemp.getColumnIndexOrThrow(columnDiaPlayName);
+                displayName = cursorTemp.getString(column_index);
+                Log.e(TAG, "获取音频文件路径  走到catch里  displayName------------" +displayName);
+
+            }
+            cursorTempTest =context.getContentResolver().query(uri, null, selection, selectionArgs, null);
+            String[] columnName = cursorTempTest.getColumnNames();
+            if(columnName != null){
+                for (int i = 0;i<columnName.length;i++){
+                    Log.e(TAG, "getDataColumn: 走到catch里 打印出来的列名有   " + columnName[i]);
+                }
+            }
+
+
+
+            cursor = context.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                    null, null, null, MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
+            cursor.moveToFirst();
+            int counter = cursor.getCount();
+
+            Log.e(TAG, "存储在sd卡上的音频文件------------before looping   文件数量  " + counter);
+            for (int j = 0; j < counter; j++) {
+                String displayNameTemp = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DISPLAY_NAME));
+//                Log.e(TAG, "获取音频文件路径  走到catch里  数据库里面的displayName------------" +displayNameTemp + "名字为空么  " + TextUtils.isEmpty(displayNameTemp));
+                if(!TextUtils.isEmpty(displayName) && displayName.equals(displayNameTemp)){
+                    Log.e(TAG, "文件名称匹配上了  ");
+                    data = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
+                    Log.e(TAG, "------------获取到的路径  " + data);
+                    break;
+                }
+                cursor.moveToNext();
+            }
+            return data;
+        }finally {
+            Log.e(TAG, "getDataColumn: 走到finally");
+            if(cursorTempTest != null){
+                cursorTempTest.close();
+            }
+            if(cursorTemp != null){
+                cursorTemp.close();
+            }
             if (cursor != null)
                 cursor.close();
         }
