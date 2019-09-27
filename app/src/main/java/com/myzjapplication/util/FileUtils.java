@@ -19,17 +19,13 @@ import com.myzjapplication.FileDataBean;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.nio.file.attribute.FileTime;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Vector;
 
 public class FileUtils {
     public static String TAG = "audioInfo";
-    private static Vector<FileDataBean> vecFile = new Vector<FileDataBean>();
     public static String getRealPathFromURI(Context context,Uri contentUri) {
         String res = null;
         String[] proj = {MediaStore.Audio.Media.DATA};
@@ -221,7 +217,8 @@ public class FileUtils {
         File parent = Environment.getExternalStorageDirectory();
         File child = null;
         String brand = SystemUtil.getDeviceBrand();
-        Log.w(TAG, "------------brand = " + brand);
+        String systemModel = SystemUtil.getSystemModel();
+        Log.w(TAG, "------------brand =    " + brand   +"   systemModel  " + systemModel);
         switch (brand) {
             case "Xiaomi":
                 child = new File(parent, "MIUI/sound_recorder");
@@ -251,6 +248,65 @@ public class FileUtils {
         }
 
     }
+    /**
+     * 获取通话录音文件
+     * @return
+     * OPPO,VIVO  手机录音文件和通话录音在同一个文件中
+     */
+    public static String getCallRecordFilePath() {
+        File parent = Environment.getExternalStorageDirectory();
+        File child = null;
+        String brand = SystemUtil.getDeviceBrand();
+        String systemModel = SystemUtil.getSystemModel();
+        Log.w(TAG, "------------brand =    " + brand   +"   systemModel  " + systemModel);
+        switch (brand) {
+            case "Xiaomi":
+                child = new File(parent, "MIUI/sound_recorder/call_rec");
+                break;
+            case "OnePlus":
+                child = new File(parent, "Record/PhoneRecord");
+                break;
+            case "Meizu":
+                child = new File(parent, "Recorder/call");
+                break;
+            case "HONOR":
+                if(!TextUtils.isEmpty(systemModel) && "KNT-AL10".equals(systemModel)){
+                    //honor
+                    //华为荣耀V8
+                    child = new File(parent, "record");
+                }else{
+                    child = new File(parent, "Sounds/CallRecord");
+                }
+
+                parent.getPath();
+                Log.d(TAG, " 华为sdcard getRecordFilePath: " + parent.getPath());
+                break;
+            case "vivo":
+//                child = new File(parent, "Voice Recorder");
+                break;
+            case "samsung":
+                child = new File(parent, "Call");
+                break;
+            case "OPPO":
+//                child = new File(parent, "Recordings");
+                break;
+            case "HUAWEI":
+                if(!TextUtils.isEmpty(systemModel) && "HUAWEI MLA-AL10".equals(systemModel)){
+                    //华为麦芒
+                    child = new File(parent, "record");
+                }else{
+                    child = new File(parent, "Sounds/CallRecord");
+                }
+
+                break;
+        }
+        if (child != null) {
+            return child.getPath();
+        } else {
+            return "";
+        }
+
+    }
 
     public static String getTecentPath() {
         File parent = Environment.getExternalStorageDirectory();
@@ -262,6 +318,7 @@ public class FileUtils {
 
 
     public static Vector<FileDataBean> getFileInfoHasFilter(String fileAbsolutePath) {
+        Vector<FileDataBean> vecFile = new Vector<>();
         Log.d(TAG, " getFileInfoHasFilter   path   " + fileAbsolutePath);
         File file = new File(fileAbsolutePath);
         if (!file.exists()) {
@@ -366,18 +423,28 @@ public class FileUtils {
         }
         DecimalFormat df = new DecimalFormat("#.00");
         String fileSize = df.format(fileLenM);
-        dataBean.setFileSizeNoCompany(fileSize);
+        dataBean.setFileSizeNoCompany(file.length());
         dataBean.setFileSizeHasCompany(fileSize + fileCompany);
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
         long lastMofified = file.lastModified();
         String fileTime = dateFormat.format(lastMofified);
+
+
+        dataBean.setFileLastModifyTimeNotDeal(lastMofified);
+
+        dataBean.setFileLastModifyTime(fileTime);
+
+
+
+//        String audioTime = FileUtils.getAudioTime(file.getPath());
+//        dataBean.setAudioTime(audioTime);
 
 //        try {
 //            FileTime t= Files.readAttributes(Paths.get(path), BasicFileAttributes.class).creationTime();
 //        } catch (IOException e) {
 //            e.printStackTrace();
 //        }
-        dataBean.setFileTime(fileTime);
+//        dataBean.setFileTime(fileTime);
         Log.e(TAG, "eee  文件名 ： " + filename + "   文件大小   " + fileSize + fileCompany + "   文件修改时间   " + fileTime + "   文件路径   " + filePath);
         return dataBean;
     }

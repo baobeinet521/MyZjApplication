@@ -33,4 +33,21 @@
         app:layout_constraintTop_toBottomOf="@+id/get_audio_info_btn"
         android:text="跳转到手机内存目录"/>
 
+    <Button
+        android:id="@+id/ceshi_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/goto_store_path"
+        android:text="测试按钮"/>
+    <Button
+        android:id="@+id/ceshi_check_contacts_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ceshi_btn"
+        android:text="检测联系人权限"/>
+
 </android.support.constraint.ConstraintLayout>

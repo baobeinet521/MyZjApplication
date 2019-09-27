@@ -41,6 +41,8 @@ public class MainActivity extends AppCompatActivity {
     private Button mBtn;
     private Button mGetAudioBtn;
     private Button mGotoStorePath;
+    private Button mCeshiBtn;
+    private Button mCheckContactsPreBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +51,15 @@ public class MainActivity extends AppCompatActivity {
         mBtn = findViewById(R.id.goto_show);
         mGetAudioBtn = findViewById(R.id.get_audio_info_btn);
         mGotoStorePath = findViewById(R.id.goto_store_path);
+        mCeshiBtn = findViewById(R.id.ceshi_btn);
+        mCheckContactsPreBtn = findViewById(R.id.ceshi_check_contacts_btn);
+
+        mCheckContactsPreBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                checkContact();
+            }
+        });
         mBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -59,17 +70,33 @@ public class MainActivity extends AppCompatActivity {
         mGetAudioBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Log.d(TAG, "    点击获取按钮    ");
                 if (checkPermissionStore(MainActivity.this)) {
                     getExternalAudioInfo();
                     geInternalAudioInfo();
+                    Log.d(TAG, "onClick: 开始获取时间 -----");
                     String path = FileUtils.getRecordFilePath();
                     Log.d(TAG, " path111111   " + path);
                     vecFile.clear();
-                    FileUtils.getFileInfoHasFilter(path);
+                    Vector<FileDataBean> record = FileUtils.getFileInfoHasFilter(path);
+                    vecFile.addAll(record);
+                    Log.d(TAG, " 录音文件数量 -----    " + record.size());
+                    String callRecordFile = FileUtils.getCallRecordFilePath();
+                    Vector<FileDataBean> callRecordFileData = FileUtils.getFileInfoHasFilter(callRecordFile);
+                    if (callRecordFileData != null) {
+                        vecFile.addAll(callRecordFileData);
+                        Log.d(TAG, " 通话记录的文件数量 -----    " + callRecordFileData.size());
+                    }
                     String wechatPath = FileUtils.getTecentPath();
-                    FileUtils.getFileInfoHasFilter(wechatPath);
+                    Vector<FileDataBean> wechat = FileUtils.getFileInfoHasFilter(wechatPath);
+                    Log.d(TAG, "onClick: 获取结束时间 -----");
+                    if (wechat != null) {
+                        vecFile.addAll(wechat);
+                        Log.d(TAG, " 微信文件数量  -----   " + wechat.size());
+                    }
+
                     if (vecFile != null) {
-                        Log.d(TAG, "onClick: vecFile Size   " + vecFile.size());
+                        Log.d(TAG, "onClick: vecFile Size -----  " + vecFile.size());
                     }
 //                    getFileInfoNoFilter(wechatPath);
                 }
@@ -90,8 +117,22 @@ public class MainActivity extends AppCompatActivity {
 //        String path = getFilePath();
 //        Log.d(TAG, "onCreate: path   " + path);
 
-    }
+        mCeshiBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(MainActivity.this, "点击按钮", Toast.LENGTH_LONG).show();
+                Log.d(TAG, "onClick: 点击按钮");
+            }
+        });
+        mCeshiBtn.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                Log.d(TAG, "onLongClick: 长按");
+                return true;
+            }
+        });
 
+    }
 
 
     public void getExternalAudioInfo() {
@@ -136,6 +177,16 @@ public class MainActivity extends AppCompatActivity {
         cursor.close();
     }
 
+
+    public void checkContact() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            // Android M Permission check
+            Log.d("检查联系人", "checkBt: ");
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_CONTACTS}, 2);
+            }
+        }
+    }
 
     public boolean checkPermissionStore(Context context) {
         int currentAPIVersion = Build.VERSION.SDK_INT;
@@ -215,11 +266,11 @@ public class MainActivity extends AppCompatActivity {
                     Log.d(TAG, "onActivityResult: 4.4以后 path " + path);
                     Toast.makeText(this, path, Toast.LENGTH_SHORT).show();
                 } else {//4.4以下下系统调用方法
-                    path = FileUtils.getRealPathFromURI(this,uri);
+                    path = FileUtils.getRealPathFromURI(this, uri);
                     Log.d(TAG, "onActivityResult: 4.4以前 path " + path);
                     Toast.makeText(MainActivity.this, path + "222222", Toast.LENGTH_SHORT).show();
                 }
-                if(TextUtils.isEmpty(path)){
+                if (TextUtils.isEmpty(path)) {
                     Toast.makeText(MainActivity.this, "没有获取的音频文件路径", Toast.LENGTH_LONG).show();
                 }
 //                FileUtils.getAudioTime(path);

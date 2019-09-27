@@ -1,11 +1,24 @@
 package com.myzjapplication;
 
+import java.util.List;
+
 public class FileDataBean {
     private String fileName;
     private String filePath;
     private String fileSizeHasCompany;
-    private String fileSizeNoCompany;
-    private String fileTime;
+    private long fileSizeNoCompany;
+    private String fileLastModifyTime;
+    private long fileLastModifyTimeNotDeal;
+    private String audioTime;
+    private List<String> mSliceFilePath;//分割文件路径
+
+    public List<String> getmSliceFilePath() {
+        return mSliceFilePath;
+    }
+
+    public void setmSliceFilePath(List<String> mSliceFilePath) {
+        this.mSliceFilePath = mSliceFilePath;
+    }
 
     public String getFileName() {
         return fileName;
@@ -31,19 +44,35 @@ public class FileDataBean {
         this.fileSizeHasCompany = fileSizeHasCompany;
     }
 
-    public String getFileSizeNoCompany() {
+    public long getFileSizeNoCompany() {
         return fileSizeNoCompany;
     }
 
-    public void setFileSizeNoCompany(String fileSizeNoCompany) {
+    public void setFileSizeNoCompany(long fileSizeNoCompany) {
         this.fileSizeNoCompany = fileSizeNoCompany;
     }
 
-    public String getFileTime() {
-        return fileTime;
+    public String getFileLastModifyTime() {
+        return fileLastModifyTime;
     }
 
-    public void setFileTime(String fileTime) {
-        this.fileTime = fileTime;
+    public void setFileLastModifyTime(String fileLastModifyTime) {
+        this.fileLastModifyTime = fileLastModifyTime;
+    }
+
+    public long getFileLastModifyTimeNotDeal() {
+        return fileLastModifyTimeNotDeal;
+    }
+
+    public void setFileLastModifyTimeNotDeal(long fileLastModifyTimeNotDeal) {
+        this.fileLastModifyTimeNotDeal = fileLastModifyTimeNotDeal;
+    }
+
+    public String getAudioTime() {
+        return audioTime;
+    }
+
+    public void setAudioTime(String audioTime) {
+        this.audioTime = audioTime;
     }
 }
